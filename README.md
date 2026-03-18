@@ -108,7 +108,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
     },
     {
       "id": "nvidia/nemotron-3-nano-30b-a3b:free",
-      "name": "NVIDIA: Nemotron 3 Nano (free)"
+      "name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)"
     },
     {
       "id": "nvidia/nemotron-3-super-120b-a12b:free",
@@ -128,7 +128,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
     },
     {
       "id": "z-ai/glm-4.5-air:free",
-      "name": "Z.AI: GLM 4.5 Air (free)"
+      "name": "Z.ai: GLM 4.5 Air (free)"
     }
   ]
 }
