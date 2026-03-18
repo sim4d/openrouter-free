@@ -7,9 +7,8 @@ A skill to fetch alpha and free models from https://openrouter.ai/models and aut
 - Automatically fetches top 3 alpha models and top 5 free models from OpenRouter
 - Filters for high-context (>128k), zero-cost ($0 prompt/$0 completion), and coding-capable models
 - Sets primary model to #1 alpha model (for complex tasks)
-- Sets fast model to #1 free model (for simple operations)
+- Sets fast model to #1 free model by top-weekly token volume
 - Updates `~/.claude/settings.local.json` with optimal model mappings
-- Provides update mechanism to get latest skill version
 - No manual model selection required
 
 ---
@@ -75,16 +74,9 @@ In Claude Code:
 
 ### Usage
 
-Simply run the skill:
 ```
 /openrouter-sync
 ```
-
-The skill will:
-1. Call the OpenRouter API to identify alpha and free models
-2. Filter for models with high context (>128k), zero cost, and coding capability
-3. Rank free models by top-weekly token volume — identical to https://openrouter.ai/models?order=top-weekly&q=free
-4. Update `~/.claude/settings.local.json` with optimal settings
 
 ---
 
@@ -135,36 +127,8 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 ```
 
 **Key settings explained:**
-- `ANTHROPIC_MODEL` – Your primary model for complex tasks
-- `ANTHROPIC_SMALL_FAST_MODEL` – Quick model for simple operations
-- `modelOptions` – Additional models available via `/model` command with display names
+- `ANTHROPIC_MODEL` – Primary model for complex tasks
+- `ANTHROPIC_SMALL_FAST_MODEL` – Fast model for simple operations
+- `modelOptions` – All models available via `/model` command
 - `API_TIMEOUT_MS` – Extended timeout for free model responses
 - `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – Increased output token limit
-
----
-
-## How It Works
-
-The skill fetches:
-- **Top 3 alpha models** (zero-cost, >128k context, OpenRouter default ordering) → Primary model set to #1 alpha
-- **Top 5 free models** (zero-cost, >128k context, sorted by top-weekly token volume) → Fast model set to #1 free
-- All qualifying models available via `/model` command
-
-## Current Top Models (as of March 2026)
-
-### Alpha Models (Top 3 - Zero Cost, >128k Context)
-| Rank | Model | Key Strength |
-| :--- | :--- | :--- |
-| 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
-| 2 | `openrouter/healer-alpha` | Healing Focus, 256k Context |
-
-### Free Models (Top 5 - Zero Cost, >128k Context, sorted by top-weekly token volume)
-Ranked by top-weekly token volume — see live ranking at https://openrouter.ai/models?order=top-weekly&q=free
-
-| Rank | Model | Key Strength |
-| :--- | :--- | :--- |
-| 1 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
-| 2 | `arcee-ai/trinity-large-preview:free` | Creative Writing, 131k Context |
-| 3 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
-| 4 | `z-ai/glm-4.5-air:free` | Efficient, 131k Context |
-| 5 | `nvidia/nemotron-3-nano-30b-a3b:free` | Lightweight, 256k Context |
