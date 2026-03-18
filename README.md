@@ -66,6 +66,9 @@ export ANTHROPIC_API_KEY=""                  # <- must be empty!
 In Claude Code:
 ```
 /plugin marketplace add sim4d/openrouter-free
+```
+
+```
 /plugin install openrouter-sync
 ```
 
