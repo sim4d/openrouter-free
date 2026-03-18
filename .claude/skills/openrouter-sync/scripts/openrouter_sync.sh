@@ -112,8 +112,8 @@ case "$1" in
         # Extract the top free model for fast use
         TOP_FREE=$(echo "$FREE_MODELS" | head -n 1 | cut -d'|' -f1)
 
-        # Prepare model options list (combine alpha and free, deduplicate)
-        ALL_MODELS=$(echo -e "$ALPHA_MODELS\n$FREE_MODELS" | sort -u | cut -d'|' -f1)
+        # Prepare model options list (combine alpha and free, deduplicate while preserving order)
+        ALL_MODELS=$(echo -e "$ALPHA_MODELS\n$FREE_MODELS" | awk -F'|' '!seen[$1]++' | cut -d'|' -f1)
 
         # Build JSON for modelOptions
         MODEL_OPTIONS_JSON=""
