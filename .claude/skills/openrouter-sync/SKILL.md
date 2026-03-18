@@ -3,21 +3,33 @@ name: openrouter-sync
 description: Fetches the top free models from OpenRouter and automatically configures Claude Code settings.
 ---
 
-# OpenRouter Free Model Sync
+# OpenRouter Model Sync
 
-This skill fetches the most recent and powerful free models from https://openrouter.ai/models, including 'free' and 'alpha' models, and automatically configures Claude Code to use them.
+This skill fetches alpha and free models from https://openrouter.ai/models and automatically configures Claude Code to use them.
 
 ## What This Skill Does
 
 When invoked, I will:
-1. Call the OpenRouter API to identify the top 3 free models
-2. Filter for models with high context (>128k) and "coding" capability
+1. Call the OpenRouter API to identify the top 3 alpha models and top 5 free models
+2. Filter for models with high context (>128k) and coding capability
 3. Update `~/.claude/settings.local.json` with:
-   - `ANTHROPIC_MODEL` – mapped to the #1 free model (primary model for complex tasks)
-   - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the fastest free model (quick model for simple operations)
-   - `modelOptions` – additional free models available via `/model` command
-   - `API_TIMEOUT_MS` – extended timeout for free model responses
+   - `ANTHROPIC_MODEL` – mapped to the #1 alpha model (primary model for complex tasks)
+   - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the #1 free model (fast model for simple operations)
+   - `modelOptions` – additional alpha and free models available via `/model` command
+   - `API_TIMEOUT_MS` – extended timeout for model responses
    - `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – increased output token limit
+
+When invoked with `/openrouter-sync update`, I will:
+- Fetch the latest version of this skill from the GitHub repository
+- Replace the local skill with the updated version
+
+## How It Works
+
+This skill uses a bash script (`scripts/openrouter_sync.sh`) that:
+- Fetches model data from the OpenRouter API
+- Filters for alpha models (top 3) and free models (top 5) with >128k context
+- Updates your Claude Code settings with the best models
+- Provides an update mechanism to get the latest skill version
 
 ## Prerequisites
 

@@ -1,12 +1,15 @@
 # openrouter-free
 
-A skill to fetch the most recent and powerful free models from https://openrouter.ai/models, including 'free' and 'alpha' models, and automatically configure Claude Code to use them.
+A skill to fetch alpha and free models from https://openrouter.ai/models and automatically configure Claude Code to use them.
 
 ## Features
 
-- Automatically fetches top free models from OpenRouter
+- Automatically fetches top 3 alpha models and top 5 free models from OpenRouter
 - Filters for high-context (>128k) and coding-capable models
+- Sets primary model to #1 alpha model (for complex tasks)
+- Sets fast model to #1 free model (for simple operations)
 - Updates `~/.claude/settings.local.json` with optimal model mappings
+- Provides update mechanism to get latest skill version
 - No manual model selection required
 
 ---
@@ -50,7 +53,6 @@ Add these to your shell config (`~/.zshrc`, `~/.bashrc`, or equivalent), then so
 export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
 export ANTHROPIC_AUTH_TOKEN="sk-or-v1-your-openrouter-key-here"
 export ANTHROPIC_API_KEY=""                  # <- must be empty!
-export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | jq -r '.data[] | select(.id | endswith(":free")) | .id' | head -n 1)
 ```
 
 > **Note:** If `jq` is not installed, run `brew install jq` first.
@@ -88,27 +90,35 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 ```json
 {
   "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
-  "ANTHROPIC_SMALL_FAST_MODEL": "stepfun/step-3.5-flash:free",
+  "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-super-120b-a12b:free",
   "modelOptions": [
     {
-      "id": "openrouter/hunter-alpha",
-      "name": "Hunter Alpha (1M Context)"
+      "id": "arcee-ai/trinity-large-preview:free",
+      "name": "Arcee AI: Trinity Large Preview (free)"
     },
     {
-      "id": "stepfun/step-3.5-flash:free",
-      "name": "Step 3.5 Flash (256k Context)"
-    },
-    {
-      "id": "nvidia/nemotron-3-nano-30b-a3b:free",
-      "name": "Nemotron 3 Nano 30B (256k Context)"
+      "id": "minimax/minimax-m2.5:free",
+      "name": "MiniMax: MiniMax M2.5 (free)"
     },
     {
       "id": "nvidia/nemotron-3-super-120b-a12b:free",
-      "name": "Nemotron 3 Super 120B (262k Context)"
+      "name": "NVIDIA: Nemotron 3 Super (free)"
     },
     {
-      "id": "openai/gpt-oss-120b:free",
-      "name": "OpenAI gpt-oss-120b (131k Context)"
+      "id": "openrouter/free",
+      "name": "Free Models Router"
+    },
+    {
+      "id": "openrouter/healer-alpha",
+      "name": "Healer Alpha"
+    },
+    {
+      "id": "openrouter/hunter-alpha",
+      "name": "Hunter Alpha"
+    },
+    {
+      "id": "stepfun/step-3.5-flash:free",
+      "name": "StepFun: Step 3.5 Flash (free)"
     }
   ],
   "API_TIMEOUT_MS": 600000,
@@ -125,10 +135,26 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 
 ---
 
-## Current Top Free Models (as of March 2026)
+## How It Works
 
+The skill now fetches:
+- **Top 3 alpha models** → Primary model set to #1 alpha
+- **Top 5 free models** → Fast model set to #1 free
+- All qualifying models (>128k context) available via `/model` command
+
+## Current Top Models (as of March 2026)
+
+### Alpha Models (Top 3)
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
 | 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
-| 2 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
-| 3 | `nvidia/nemotron-3-nano-30b-a3b:free` | Concise Code, 256k Context |
+| 2 | `openrouter/healer-alpha` | Healing Focus, 256k Context |
+
+### Free Models (Top 5)
+| Rank | Model | Key Strength |
+| :--- | :--- | :--- |
+| 1 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
+| 2 | `minimax/minimax-m2.5:free` | Multimodal, 196k Context |
+| 3 | `openrouter/free` | Free Models Router, 200k Context |
+| 4 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
+| 5 | `arcee-ai/trinity-large-preview:free` | Creative Writing, 131k Context |
