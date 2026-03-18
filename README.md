@@ -51,6 +51,12 @@ export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | /usr/loca
 
 > **Note:** If `jq` is not installed, run `brew install jq` first.
 
+### Start Claude Code CLI
+
+```bash
+claude
+```
+
 ## 3. Run openrouter-sync Skill
 
 ### Deployment
