@@ -92,8 +92,13 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 
 ```json
 {
-  "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
-  "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-super-120b-a12b:free",
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
+    "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-super-120b-a12b:free",
+    "API_TIMEOUT_MS": 600000,
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
+  },
   "modelOptions": [
     {
       "id": "arcee-ai/trinity-large-preview:free",
@@ -123,9 +128,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
       "id": "stepfun/step-3.5-flash:free",
       "name": "StepFun: Step 3.5 Flash (free)"
     }
-  ],
-  "API_TIMEOUT_MS": 600000,
-  "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
+  ]
 }
 ```
 

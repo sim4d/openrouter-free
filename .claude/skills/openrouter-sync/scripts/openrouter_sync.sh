@@ -110,17 +110,22 @@ case "$1" in
             echo "{}" > "$SETTINGS_FILE"
         fi
 
-        # Update settings with new values
+        # Update settings with new values - replace entire structure
         TMP_FILE=$(mktemp)
         jq --arg alpha_model "$TOP_ALPHA" \
            --arg free_model "$TOP_FREE" \
            --argjson model_options "$MODEL_OPTIONS_JSON" \
            '
-           .ANTHROPIC_MODEL = $alpha_model |
-           .ANTHROPIC_SMALL_FAST_MODEL = $free_model |
-           .modelOptions = $model_options |
-           .API_TIMEOUT_MS = 600000 |
-           .CLAUDE_CODE_MAX_OUTPUT_TOKENS = 16384
+           {
+             "env": {
+               "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+               "ANTHROPIC_MODEL": $alpha_model,
+               "ANTHROPIC_SMALL_FAST_MODEL": $free_model,
+               "API_TIMEOUT_MS": 600000,
+               "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
+             },
+             "modelOptions": $model_options
+           }
            ' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
 
         echo "✅ Successfully updated Claude Code settings:"

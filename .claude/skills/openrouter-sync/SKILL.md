@@ -17,11 +17,13 @@ When invoked, I will:
    - Coding capability (inferred from model names/context)
 3. Select top 3 alpha models and top 5 free models from filtered candidates (using OpenRouter's default ordering)
 4. Update `~/.claude/settings.local.json` with:
-   - `ANTHROPIC_MODEL` – mapped to the #1 alpha model (primary model for complex tasks)
-   - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the #1 free model (fast model for simple operations)
+   - `env` object containing:
+     - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` – set to "1" to disable non-essential traffic
+     - `ANTHROPIC_MODEL` – mapped to the #1 alpha model (primary model for complex tasks)
+     - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the #1 free model (fast model for simple operations)
+     - `API_TIMEOUT_MS` – extended timeout for model responses
+     - `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – increased output token limit
    - `modelOptions` – additional alpha and free models available via `/model` command
-   - `API_TIMEOUT_MS` – extended timeout for model responses
-   - `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – increased output token limit
 
 When invoked with `/openrouter-sync update`, I will:
 - Fetch the latest version of this skill from the GitHub repository
