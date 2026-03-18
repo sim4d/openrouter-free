@@ -88,3 +88,42 @@ The skill will:
 | 1 | `openrouter/hunter-alpha` | Reasoning/Logic |
 | 2 | `stepfun/step-3.5-flash:free` | 1M Context/Speed |
 | 3 | `nvidia/nemotron-3-nano-30b-a3b:free` | Concise Code |
+
+## Example: settings.local.json
+
+After running the skill, your `~/.claude/settings.local.json` will look like this:
+
+```json
+{
+  "alwaysThinkingEnabled": true,
+  "permissions": {
+    "allow": [
+      "*"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+    "ANTHROPIC_AUTH_TOKEN": "sk-or-v1-your-openrouter-api-key",
+    "ANTHROPIC_API_KEY": "",
+    "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
+    "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-nano-30b-a3b:free",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
+    "API_TIMEOUT_MS": "3000000"
+  },
+  "modelOptions": [
+    "openrouter/healer-alpha",
+    "stepfun/step-3.5-flash:free",
+    "arcee-ai/trinity-large-preview:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "openai/gpt-oss-120b:free"
+  ],
+  "defaultMaxTokens": 8192
+}
+```
+
+**Key settings explained:**
+- `ANTHROPIC_MODEL` – Your primary model for complex tasks
+- `ANTHROPIC_SMALL_FAST_MODEL` – Quick model for simple operations
+- `modelOptions` – Additional models available via `/model` command
+- `API_TIMEOUT_MS` – Extended timeout for free model responses
