@@ -10,9 +10,13 @@ This skill fetches alpha and free models from https://openrouter.ai/models and a
 ## What This Skill Does
 
 When invoked, I will:
-1. Call the OpenRouter API to identify the top 3 alpha models and top 5 free models
-2. Filter for models with high context (>128k) and coding capability
-3. Update `~/.claude/settings.local.json` with:
+1. Call the OpenRouter API to identify alpha and free models
+2. Filter for models with:
+   - High context (>128k tokens)
+   - Zero cost ($0 prompt and $0 completion)
+   - Coding capability (inferred from model names/context)
+3. Select top 3 alpha models and top 5 free models from filtered candidates
+4. Update `~/.claude/settings.local.json` with:
    - `ANTHROPIC_MODEL` – mapped to the #1 alpha model (primary model for complex tasks)
    - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the #1 free model (fast model for simple operations)
    - `modelOptions` – additional alpha and free models available via `/model` command
@@ -27,7 +31,8 @@ When invoked with `/openrouter-sync update`, I will:
 
 This skill uses a bash script (`scripts/openrouter_sync.sh`) that:
 - Fetches model data from the OpenRouter API
-- Filters for alpha models (top 3) and free models (top 5) with >128k context
+- Filters for zero-cost models ($0 prompt/$0 completion) with >128k context
+- Selects top 3 alpha models and top 5 free models from candidates
 - Updates your Claude Code settings with the best models
 - Provides an update mechanism to get the latest skill version
 

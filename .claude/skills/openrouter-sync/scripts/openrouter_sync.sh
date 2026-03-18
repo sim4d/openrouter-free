@@ -31,7 +31,7 @@ fetch_models() {
         -H "X-Title: Claude Code"
 }
 
-# Function to extract model info with context length and coding capability
+# Function to extract model info with context length and zero cost
 extract_model_info() {
     local models_json="$1"
     local filter_type="$2"  # "alpha" or "free"
@@ -41,6 +41,7 @@ extract_model_info() {
         .data[]
         | select(.id | test(\"${filter_type}\"))
         | select(.context_length > 128000)
+        | select(.pricing.prompt == \"0\" and .pricing.completion == \"0\")
         | {id: .id, context_length: .context_length, name: .name // .id}
         | \"\\(.id)|\\(.context_length)|\\(.name)\"
     " | head -n "$limit"

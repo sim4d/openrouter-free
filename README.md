@@ -5,7 +5,7 @@ A skill to fetch alpha and free models from https://openrouter.ai/models and aut
 ## Features
 
 - Automatically fetches top 3 alpha models and top 5 free models from OpenRouter
-- Filters for high-context (>128k) and coding-capable models
+- Filters for high-context (>128k), zero-cost ($0 prompt/$0 completion), and coding-capable models
 - Sets primary model to #1 alpha model (for complex tasks)
 - Sets fast model to #1 free model (for simple operations)
 - Updates `~/.claude/settings.local.json` with optimal model mappings
@@ -141,19 +141,19 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 ## How It Works
 
 The skill now fetches:
-- **Top 3 alpha models** → Primary model set to #1 alpha
-- **Top 5 free models** → Fast model set to #1 free
-- All qualifying models (>128k context) available via `/model` command
+- **Top 3 alpha models** (zero-cost, >128k context) → Primary model set to #1 alpha
+- **Top 5 free models** (zero-cost, >128k context) → Fast model set to #1 free
+- All qualifying models (zero-cost, >128k context) available via `/model` command
 
 ## Current Top Models (as of March 2026)
 
-### Alpha Models (Top 3)
+### Alpha Models (Top 3 - Zero Cost, >128k Context)
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
 | 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
 | 2 | `openrouter/healer-alpha` | Healing Focus, 256k Context |
 
-### Free Models (Top 5)
+### Free Models (Top 5 - Zero Cost, >128k Context)
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
 | 1 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
