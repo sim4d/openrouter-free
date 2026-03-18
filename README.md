@@ -103,32 +103,32 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
   },
   "modelOptions": [
     {
-      "id": "arcee-ai/trinity-large-preview:free",
-      "name": "Arcee AI: Trinity Large Preview (free)"
-    },
-    {
-      "id": "nvidia/nemotron-3-nano-30b-a3b:free",
-      "name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)"
-    },
-    {
-      "id": "nvidia/nemotron-3-super-120b-a12b:free",
-      "name": "NVIDIA: Nemotron 3 Super (free)"
+      "id": "openrouter/hunter-alpha",
+      "name": "Hunter Alpha"
     },
     {
       "id": "openrouter/healer-alpha",
       "name": "Healer Alpha"
     },
     {
-      "id": "openrouter/hunter-alpha",
-      "name": "Hunter Alpha"
-    },
-    {
       "id": "stepfun/step-3.5-flash:free",
       "name": "StepFun: Step 3.5 Flash (free)"
     },
     {
+      "id": "arcee-ai/trinity-large-preview:free",
+      "name": "Arcee AI: Trinity Large Preview (free)"
+    },
+    {
+      "id": "nvidia/nemotron-3-super-120b-a12b:free",
+      "name": "NVIDIA: Nemotron 3 Super (free)"
+    },
+    {
       "id": "z-ai/glm-4.5-air:free",
       "name": "Z.ai: GLM 4.5 Air (free)"
+    },
+    {
+      "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+      "name": "NVIDIA: Nemotron 3 Nano 30B A3B (free)"
     }
   ]
 }
