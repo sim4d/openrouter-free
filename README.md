@@ -53,6 +53,7 @@ Add these to your shell config (`~/.zshrc`, `~/.bashrc`, or equivalent), then so
 export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
 export ANTHROPIC_AUTH_TOKEN="sk-or-v1-your-openrouter-key-here"
 export ANTHROPIC_API_KEY=""                  # <- must be empty!
+export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | jq -r '.data[] | select(.id | endswith(":free")) | .id' | head -n 1)
 ```
 
 > **Note:** If `jq` is not installed, run `brew install jq` first.
