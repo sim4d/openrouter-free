@@ -83,7 +83,7 @@ Simply run the skill:
 The skill will:
 1. Call the OpenRouter API to identify alpha and free models
 2. Filter for models with high context (>128k), zero cost, and coding capability
-3. Rank free models by `token_processed_7d` (7-day token volume) — mirrors https://openrouter.ai/models?q=free
+3. Rank free models by top-weekly token volume — identical to https://openrouter.ai/models?order=top-weekly&q=free
 4. Update `~/.claude/settings.local.json` with optimal settings
 
 ---
@@ -97,7 +97,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
   "env": {
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
-    "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-super-120b-a12b:free",
+    "ANTHROPIC_SMALL_FAST_MODEL": "stepfun/step-3.5-flash:free",
     "API_TIMEOUT_MS": 600000,
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
   },
@@ -107,16 +107,12 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
       "name": "Arcee AI: Trinity Large Preview (free)"
     },
     {
-      "id": "minimax/minimax-m2.5:free",
-      "name": "MiniMax: MiniMax M2.5 (free)"
+      "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+      "name": "NVIDIA: Nemotron 3 Nano (free)"
     },
     {
       "id": "nvidia/nemotron-3-super-120b-a12b:free",
       "name": "NVIDIA: Nemotron 3 Super (free)"
-    },
-    {
-      "id": "openrouter/free",
-      "name": "Free Models Router"
     },
     {
       "id": "openrouter/healer-alpha",
@@ -129,6 +125,10 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
     {
       "id": "stepfun/step-3.5-flash:free",
       "name": "StepFun: Step 3.5 Flash (free)"
+    },
+    {
+      "id": "z-ai/glm-4.5-air:free",
+      "name": "Z.AI: GLM 4.5 Air (free)"
     }
   ]
 }
@@ -147,7 +147,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 
 The skill fetches:
 - **Top 3 alpha models** (zero-cost, >128k context, OpenRouter default ordering) → Primary model set to #1 alpha
-- **Top 5 free models** (zero-cost, >128k context, sorted by `token_processed_7d`) → Fast model set to #1 free
+- **Top 5 free models** (zero-cost, >128k context, sorted by top-weekly token volume) → Fast model set to #1 free
 - All qualifying models available via `/model` command
 
 ## Current Top Models (as of March 2026)
@@ -158,13 +158,13 @@ The skill fetches:
 | 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
 | 2 | `openrouter/healer-alpha` | Healing Focus, 256k Context |
 
-### Free Models (Top 5 - Zero Cost, >128k Context, sorted by `token_processed_7d`)
-Ranked by 7-day token volume — see live ranking at https://openrouter.ai/models?q=free
+### Free Models (Top 5 - Zero Cost, >128k Context, sorted by top-weekly token volume)
+Ranked by top-weekly token volume — see live ranking at https://openrouter.ai/models?order=top-weekly&q=free
 
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
-| 1 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
-| 2 | `minimax/minimax-m2.5:free` | Multimodal, 196k Context |
-| 3 | `openrouter/free` | Free Models Router, 200k Context |
-| 4 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
-| 5 | `arcee-ai/trinity-large-preview:free` | Creative Writing, 131k Context |
+| 1 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
+| 2 | `arcee-ai/trinity-large-preview:free` | Creative Writing, 131k Context |
+| 3 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
+| 4 | `z-ai/glm-4.5-air:free` | Efficient, 131k Context |
+| 5 | `nvidia/nemotron-3-nano-30b-a3b:free` | Lightweight, 256k Context |

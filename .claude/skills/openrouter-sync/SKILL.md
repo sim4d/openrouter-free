@@ -17,7 +17,7 @@ When invoked, I will:
    - Coding capability (inferred from model names/context)
 3. Select top 3 alpha models and top 5 free models from filtered candidates:
    - **Alpha models**: sorted by OpenRouter's default ordering
-   - **Free models**: sorted by `token_processed_7d` (7-day token volume, highest first) — mirrors the ranking shown at https://openrouter.ai/models?q=free
+   - **Free models**: sorted by top-weekly token volume — identical ranking to https://openrouter.ai/models?order=top-weekly&q=free
 4. Update `~/.claude/settings.local.json` with:
    - `env` object containing:
      - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` – set to "1" to disable non-essential traffic
@@ -36,7 +36,7 @@ When invoked with `/openrouter-sync update`, I will:
 This skill uses a bash script (`scripts/openrouter_sync.sh`) that:
 - Fetches model data from the OpenRouter API
 - Filters for zero-cost models ($0 prompt/$0 completion) with >128k context
-- Selects top 3 alpha models (by OpenRouter's default ordering) and top 5 free models sorted by `token_processed_7d` (7-day token volume) — the same ranking used at https://openrouter.ai/models?q=free
+- Selects top 3 alpha models (by OpenRouter's default ordering) and top 5 free models sorted by top-weekly token volume via `/api/frontend/models/find?order=top-weekly&q=free` — identical to https://openrouter.ai/models?order=top-weekly&q=free
 - Updates your Claude Code settings with the best models
 - Provides an update mechanism to get the latest skill version
 
@@ -59,13 +59,15 @@ Before running this skill, ensure you have:
 
 ## Current Top Free Models (as of March 2026)
 
-Ranked by `token_processed_7d` (7-day token volume) — see live ranking at https://openrouter.ai/models?q=free
+Ranked by top-weekly token volume — see live ranking at https://openrouter.ai/models?order=top-weekly&q=free
 
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
-| 1 | `openrouter/hunter-alpha` | Reasoning/Logic |
-| 2 | `stepfun/step-3.5-flash:free` | 1M Context/Speed |
-| 3 | `nvidia/nemotron-3-nano-30b-a3b:free` | Concise Code |
+| 1 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
+| 2 | `arcee-ai/trinity-large-preview:free` | Creative Writing, 131k Context |
+| 3 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |
+| 4 | `z-ai/glm-4.5-air:free` | Efficient, 131k Context |
+| 5 | `nvidia/nemotron-3-nano-30b-a3b:free` | Lightweight, 256k Context |
 
 ## Usage
 

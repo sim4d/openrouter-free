@@ -23,9 +23,18 @@ if [[ -z "$ANTHROPIC_BASE_URL" || -z "$ANTHROPIC_AUTH_TOKEN" ]]; then
     exit 1
 fi
 
-# Function to fetch models from OpenRouter API
+# Function to fetch models from OpenRouter API (default ordering, used for alpha models)
 fetch_models() {
     curl -s "https://openrouter.ai/api/v1/models" \
+        -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
+        -H "HTTP-Referer: https://claude.ai" \
+        -H "X-Title: Claude Code"
+}
+
+# Function to fetch free models sorted by top-weekly (token_processed_7d) server-side
+# Uses the same endpoint as https://openrouter.ai/models?order=top-weekly&q=free
+fetch_free_models_ordered() {
+    curl -s "https://openrouter.ai/api/frontend/models/find?order=top-weekly&q=free" \
         -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
         -H "HTTP-Referer: https://claude.ai" \
         -H "X-Title: Claude Code"
@@ -47,19 +56,18 @@ extract_model_info() {
     " | head -n "$limit"
 }
 
-# Function to extract free models sorted by token_processed_7d (7-day token volume)
+# Function to extract free models in top-weekly order (ordering applied server-side)
+# Response uses .data.models[].slug (without :free suffix) and .endpoint.is_free
 extract_free_models() {
     local models_json="$1"
     local limit="$2"
 
     echo "$models_json" | jq -r "
-        [.data[]
-        | select(.id | test(\":free\"))
+        .data.models[]
+        | select(.endpoint.is_free == true)
         | select(.context_length > 128000)
-        | select(.pricing.prompt == \"0\" and .pricing.completion == \"0\")]
-        | sort_by(-(.token_processed_7d // 0))
-        | .[]
-        | {id: .id, context_length: .context_length, name: .name // .id}
+        | select(.slug | test(\"alpha\") | not)
+        | {id: (.slug + \":free\"), context_length: .context_length, name: .name // .slug}
         | \"\\(.id)|\\(.context_length)|\\(.name)\"
     " | head -n "$limit"
 }
@@ -85,6 +93,7 @@ case "$1" in
         # Normal operation: fetch and configure models
         echo "Fetching models from OpenRouter API..."
         MODELS_JSON=$(fetch_models)
+        FREE_MODELS_JSON=$(fetch_free_models_ordered)
 
         if [[ -z "$MODELS_JSON" || "$MODELS_JSON" == "null" ]]; then
             echo "Error: Failed to fetch models from OpenRouter API"
@@ -94,8 +103,8 @@ case "$1" in
         echo "Fetching top 3 alpha models..."
         ALPHA_MODELS=$(extract_model_info "$MODELS_JSON" "alpha" 3)
 
-        echo "Fetching top 5 free models (sorted by token_processed_7d)..."
-        FREE_MODELS=$(extract_free_models "$MODELS_JSON" 5)
+        echo "Fetching top 5 free models (sorted by top-weekly token volume)..."
+        FREE_MODELS=$(extract_free_models "$FREE_MODELS_JSON" 5)
 
         # Extract the top alpha model for primary use
         TOP_ALPHA=$(echo "$ALPHA_MODELS" | head -n 1 | cut -d'|' -f1)
