@@ -4,10 +4,12 @@ A skill to fetch the most recent and powerful free models from https://openroute
 
 ## Features
 
-- Automatically fetches top 3 free models from OpenRouter
+- Automatically fetches top free models from OpenRouter
 - Filters for high-context (>128k) and coding-capable models
 - Updates `~/.claude/settings.local.json` with optimal model mappings
 - No manual model selection required
+
+---
 
 ## 1. Preparation
 
@@ -30,6 +32,8 @@ npm install -g @anthropic-ai/claude-code
 brew install claude-code
 ```
 
+---
+
 ## 2. Quick Start
 
 ### Get OpenRouter API Key
@@ -46,16 +50,12 @@ Add these to your shell config (`~/.zshrc`, `~/.bashrc`, or equivalent), then so
 export ANTHROPIC_BASE_URL="https://openrouter.ai/api/v1"
 export ANTHROPIC_AUTH_TOKEN="sk-or-v1-your-openrouter-key-here"
 export ANTHROPIC_API_KEY=""                  # <- must be empty!
-export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | /usr/local/bin/jq -r '.data[] | select(.id | endswith(":free")) | .id' | head -n 1)
+export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | jq -r '.data[] | select(.id | endswith(":free")) | .id' | head -n 1)
 ```
 
 > **Note:** If `jq` is not installed, run `brew install jq` first.
 
-### Start Claude Code CLI
-
-```bash
-claude
-```
+---
 
 ## 3. Run openrouter-sync Skill
 
@@ -75,55 +75,60 @@ Simply run the skill:
 ```
 
 The skill will:
-1. Call the OpenRouter API to identify the top 3 free models
-2. Filter for models with high context (>128k) and "coding" capability
-3. Update `~/.claude/settings.local.json` with:
-   - `ANTHROPIC_MODEL` – mapped to the #1 free model
-   - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the fastest free model
+1. Call the OpenRouter API to identify the top free models
+2. Filter for models with high context (>128k) and coding capability
+3. Update `~/.claude/settings.local.json` with optimal settings
 
-### Current Top Free Models (as of March 2026)
+---
 
-| Rank | Model | Key Strength |
-| :--- | :--- | :--- |
-| 1 | `openrouter/hunter-alpha` | Reasoning/Logic |
-| 2 | `stepfun/step-3.5-flash:free` | 1M Context/Speed |
-| 3 | `nvidia/nemotron-3-nano-30b-a3b:free` | Concise Code |
+## Example: Output settings.local.json
 
-## Example: settings.local.json
-
-After running the skill, your `~/.claude/settings.local.json` will look like this:
+After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look like this:
 
 ```json
 {
-  "alwaysThinkingEnabled": true,
-  "permissions": {
-    "allow": [
-      "*"
-    ]
-  },
-  "env": {
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
-    "ANTHROPIC_AUTH_TOKEN": "sk-or-v1-your-openrouter-api-key",
-    "ANTHROPIC_API_KEY": "",
-    "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
-    "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-nano-30b-a3b:free",
-    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
-    "API_TIMEOUT_MS": "3000000"
-  },
+  "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
+  "ANTHROPIC_SMALL_FAST_MODEL": "stepfun/step-3.5-flash:free",
   "modelOptions": [
-    "openrouter/healer-alpha",
-    "stepfun/step-3.5-flash:free",
-    "arcee-ai/trinity-large-preview:free",
-    "nvidia/nemotron-3-super-120b-a12b:free",
-    "openai/gpt-oss-120b:free"
+    {
+      "id": "openrouter/hunter-alpha",
+      "name": "Hunter Alpha (1M Context)"
+    },
+    {
+      "id": "stepfun/step-3.5-flash:free",
+      "name": "Step 3.5 Flash (256k Context)"
+    },
+    {
+      "id": "nvidia/nemotron-3-nano-30b-a3b:free",
+      "name": "Nemotron 3 Nano 30B (256k Context)"
+    },
+    {
+      "id": "nvidia/nemotron-3-super-120b-a12b:free",
+      "name": "Nemotron 3 Super 120B (262k Context)"
+    },
+    {
+      "id": "openai/gpt-oss-120b:free",
+      "name": "OpenAI gpt-oss-120b (131k Context)"
+    }
   ],
-  "defaultMaxTokens": 8192
+  "API_TIMEOUT_MS": 600000,
+  "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
 }
 ```
 
 **Key settings explained:**
 - `ANTHROPIC_MODEL` – Your primary model for complex tasks
 - `ANTHROPIC_SMALL_FAST_MODEL` – Quick model for simple operations
-- `modelOptions` – Additional models available via `/model` command
+- `modelOptions` – Additional models available via `/model` command with display names
 - `API_TIMEOUT_MS` – Extended timeout for free model responses
+- `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – Increased output token limit
+
+---
+
+## Current Top Free Models (as of March 2026)
+
+| Rank | Model | Key Strength |
+| :--- | :--- | :--- |
+| 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
+| 2 | `stepfun/step-3.5-flash:free` | Speed, 256k Context |
+| 3 | `nvidia/nemotron-3-nano-30b-a3b:free` | Concise Code, 256k Context |
