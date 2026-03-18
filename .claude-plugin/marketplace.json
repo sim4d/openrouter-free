@@ -1,5 +1,7 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "openrouter-free",
+  "description": "Fetches the most recent and powerful free models from OpenRouter and automatically configures Claude Code to use them.",
   "owner": {
     "name": "sim4d"
   },
@@ -7,7 +9,11 @@
     {
       "name": "openrouter-sync",
       "description": "Fetches the top free models from OpenRouter and automatically configures Claude Code settings.",
-      "source": "."
+      "author": {
+        "name": "sim4d"
+      },
+      "source": "./.claude/skills/openrouter-sync",
+      "category": "productivity"
     }
   ]
 }
