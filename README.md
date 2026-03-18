@@ -81,9 +81,10 @@ Simply run the skill:
 ```
 
 The skill will:
-1. Call the OpenRouter API to identify the top free models
-2. Filter for models with high context (>128k) and coding capability
-3. Update `~/.claude/settings.local.json` with optimal settings
+1. Call the OpenRouter API to identify alpha and free models
+2. Filter for models with high context (>128k), zero cost, and coding capability
+3. Rank free models by `token_processed_7d` (7-day token volume) — mirrors https://openrouter.ai/models?q=free
+4. Update `~/.claude/settings.local.json` with optimal settings
 
 ---
 
@@ -144,10 +145,10 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 
 ## How It Works
 
-The skill now fetches:
-- **Top 3 alpha models** (zero-cost, >128k context) → Primary model set to #1 alpha
-- **Top 5 free models** (zero-cost, >128k context) → Fast model set to #1 free
-- All qualifying models (zero-cost, >128k context) available via `/model` command
+The skill fetches:
+- **Top 3 alpha models** (zero-cost, >128k context, OpenRouter default ordering) → Primary model set to #1 alpha
+- **Top 5 free models** (zero-cost, >128k context, sorted by `token_processed_7d`) → Fast model set to #1 free
+- All qualifying models available via `/model` command
 
 ## Current Top Models (as of March 2026)
 
@@ -157,7 +158,9 @@ The skill now fetches:
 | 1 | `openrouter/hunter-alpha` | Reasoning/Logic, 1M Context |
 | 2 | `openrouter/healer-alpha` | Healing Focus, 256k Context |
 
-### Free Models (Top 5 - Zero Cost, >128k Context)
+### Free Models (Top 5 - Zero Cost, >128k Context, sorted by `token_processed_7d`)
+Ranked by 7-day token volume — see live ranking at https://openrouter.ai/models?q=free
+
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |
 | 1 | `nvidia/nemotron-3-super-120b-a12b:free` | Concise Code, 262k Context |

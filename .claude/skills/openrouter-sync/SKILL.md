@@ -15,7 +15,9 @@ When invoked, I will:
    - High context (>128k tokens)
    - Zero cost ($0 prompt and $0 completion)
    - Coding capability (inferred from model names/context)
-3. Select top 3 alpha models and top 5 free models from filtered candidates (using OpenRouter's default ordering)
+3. Select top 3 alpha models and top 5 free models from filtered candidates:
+   - **Alpha models**: sorted by OpenRouter's default ordering
+   - **Free models**: sorted by `token_processed_7d` (7-day token volume, highest first) — mirrors the ranking shown at https://openrouter.ai/models?q=free
 4. Update `~/.claude/settings.local.json` with:
    - `env` object containing:
      - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` – set to "1" to disable non-essential traffic
@@ -34,7 +36,7 @@ When invoked with `/openrouter-sync update`, I will:
 This skill uses a bash script (`scripts/openrouter_sync.sh`) that:
 - Fetches model data from the OpenRouter API
 - Filters for zero-cost models ($0 prompt/$0 completion) with >128k context
-- Selects top 3 alpha models and top 5 free models from candidates (based on OpenRouter's default ordering)
+- Selects top 3 alpha models (by OpenRouter's default ordering) and top 5 free models sorted by `token_processed_7d` (7-day token volume) — the same ranking used at https://openrouter.ai/models?q=free
 - Updates your Claude Code settings with the best models
 - Provides an update mechanism to get the latest skill version
 
@@ -56,6 +58,8 @@ Before running this skill, ensure you have:
 3. **jq installed** – Run `brew install jq` if not already installed
 
 ## Current Top Free Models (as of March 2026)
+
+Ranked by `token_processed_7d` (7-day token volume) — see live ranking at https://openrouter.ai/models?q=free
 
 | Rank | Model | Key Strength |
 | :--- | :--- | :--- |

@@ -31,7 +31,7 @@ fetch_models() {
         -H "X-Title: Claude Code"
 }
 
-# Function to extract model info with context length and zero cost
+# Function to extract alpha model info (uses OpenRouter's default ordering)
 extract_model_info() {
     local models_json="$1"
     local filter_type="$2"  # "alpha" or "free"
@@ -42,6 +42,23 @@ extract_model_info() {
         | select(.id | test(\"${filter_type}\"))
         | select(.context_length > 128000)
         | select(.pricing.prompt == \"0\" and .pricing.completion == \"0\")
+        | {id: .id, context_length: .context_length, name: .name // .id}
+        | \"\\(.id)|\\(.context_length)|\\(.name)\"
+    " | head -n "$limit"
+}
+
+# Function to extract free models sorted by token_processed_7d (7-day token volume)
+extract_free_models() {
+    local models_json="$1"
+    local limit="$2"
+
+    echo "$models_json" | jq -r "
+        [.data[]
+        | select(.id | test(\":free\"))
+        | select(.context_length > 128000)
+        | select(.pricing.prompt == \"0\" and .pricing.completion == \"0\")]
+        | sort_by(-(.token_processed_7d // 0))
+        | .[]
         | {id: .id, context_length: .context_length, name: .name // .id}
         | \"\\(.id)|\\(.context_length)|\\(.name)\"
     " | head -n "$limit"
@@ -77,8 +94,8 @@ case "$1" in
         echo "Fetching top 3 alpha models..."
         ALPHA_MODELS=$(extract_model_info "$MODELS_JSON" "alpha" 3)
 
-        echo "Fetching top 5 free models..."
-        FREE_MODELS=$(extract_model_info "$MODELS_JSON" "free" 5)
+        echo "Fetching top 5 free models (sorted by token_processed_7d)..."
+        FREE_MODELS=$(extract_free_models "$MODELS_JSON" 5)
 
         # Extract the top alpha model for primary use
         TOP_ALPHA=$(echo "$ALPHA_MODELS" | head -n 1 | cut -d'|' -f1)
