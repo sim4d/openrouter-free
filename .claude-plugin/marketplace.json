@@ -1,0 +1,12 @@
+{
+  "name": "openrouter-free",
+  "description": "A skill to fetch the most recent and powerful free models from OpenRouter and automatically configure Claude Code to use them.",
+  "version": "1.0.0",
+  "skills": [
+    {
+      "name": "openrouter-sync",
+      "description": "Fetches the top free models from OpenRouter and automatically configures Claude Code settings.",
+      "path": ".claude/skills/openrouter-sync"
+    }
+  ]
+}
