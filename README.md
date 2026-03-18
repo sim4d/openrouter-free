@@ -64,6 +64,9 @@ export ANTHROPIC_MODEL=$(curl -s https://openrouter.ai/api/v1/models | jq -r '.d
 In Claude Code:
 ```
 /plugin marketplace add sim4d/openrouter-free
+```
+
+```
 /plugin install openrouter-sync
 ```
 
