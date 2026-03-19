@@ -23,15 +23,15 @@ if [[ -z "$ANTHROPIC_BASE_URL" || -z "$ANTHROPIC_AUTH_TOKEN" ]]; then
     exit 1
 fi
 
-# Function to fetch models from OpenRouter API (default ordering, used for alpha models)
-fetch_models() {
-    curl -s "https://openrouter.ai/api/v1/models" \
+# Function to fetch alpha models via frontend API (alpha models no longer appear in v1 API)
+fetch_alpha_models() {
+    curl -s "https://openrouter.ai/api/frontend/models/find?order=top-weekly&q=alpha" \
         -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
         -H "HTTP-Referer: https://claude.ai" \
         -H "X-Title: Claude Code"
 }
 
-# Function to fetch free models sorted by top-weekly (token_processed_7d) server-side
+# Function to fetch free models sorted by top-weekly server-side
 # Uses the same endpoint as https://openrouter.ai/models?order=top-weekly&q=free
 fetch_free_models_ordered() {
     curl -s "https://openrouter.ai/api/frontend/models/find?order=top-weekly&q=free" \
@@ -40,18 +40,17 @@ fetch_free_models_ordered() {
         -H "X-Title: Claude Code"
 }
 
-# Function to extract alpha model info (uses OpenRouter's default ordering)
-extract_model_info() {
+# Function to extract alpha models from frontend API response
+# Alpha models use .slug directly (no :free suffix), filtered by openrouter/ prefix and >128k context
+extract_alpha_models() {
     local models_json="$1"
-    local filter_type="$2"  # "alpha" or "free"
-    local limit="$3"
+    local limit="$2"
 
     echo "$models_json" | jq -r "
-        .data[]
-        | select(.id | test(\"${filter_type}\"))
+        .data.models[]
+        | select(.slug | test(\"^openrouter/.*alpha\"))
         | select(.context_length > 128000)
-        | select(.pricing.prompt == \"0\" and .pricing.completion == \"0\")
-        | {id: .id, context_length: .context_length, name: .name // .id}
+        | {id: .slug, context_length: .context_length, name: .name // .slug}
         | \"\\(.id)|\\(.context_length)|\\(.name)\"
     " | head -n "$limit"
 }
@@ -92,16 +91,16 @@ case "$1" in
     *)
         # Normal operation: fetch and configure models
         echo "Fetching models from OpenRouter API..."
-        MODELS_JSON=$(fetch_models)
+        ALPHA_MODELS_JSON=$(fetch_alpha_models)
         FREE_MODELS_JSON=$(fetch_free_models_ordered)
 
-        if [[ -z "$MODELS_JSON" || "$MODELS_JSON" == "null" ]]; then
+        if [[ -z "$ALPHA_MODELS_JSON" || -z "$FREE_MODELS_JSON" ]]; then
             echo "Error: Failed to fetch models from OpenRouter API"
             exit 1
         fi
 
         echo "Fetching top 3 alpha models..."
-        ALPHA_MODELS=$(extract_model_info "$MODELS_JSON" "alpha" 3)
+        ALPHA_MODELS=$(extract_alpha_models "$ALPHA_MODELS_JSON" 3)
 
         echo "Fetching top 5 free models (sorted by top-weekly token volume)..."
         FREE_MODELS=$(extract_free_models "$FREE_MODELS_JSON" 5)
@@ -113,13 +112,12 @@ case "$1" in
         TOP_FREE=$(echo "$FREE_MODELS" | head -n 1 | cut -d'|' -f1)
 
         # Prepare model options list (combine alpha and free, deduplicate while preserving order)
-        ALL_MODELS=$(echo -e "$ALPHA_MODELS\n$FREE_MODELS" | awk -F'|' '!seen[$1]++' | cut -d'|' -f1)
+        ALL_MODELS=$(echo -e "$ALPHA_MODELS\n$FREE_MODELS" | awk -F'|' '!seen[$1]++')
 
-        # Build JSON for modelOptions
+        # Build JSON for modelOptions using id and name from the pipe-delimited list
         MODEL_OPTIONS_JSON=""
-        while IFS= read -r model_id; do
+        while IFS='|' read -r model_id model_ctx model_name; do
             if [[ -n "$model_id" ]]; then
-                model_name=$(echo "$MODELS_JSON" | jq -r ".data[] | select(.id == \"$model_id\") | .name // .id" | head -n 1)
                 if [[ -z "$MODEL_OPTIONS_JSON" ]]; then
                     MODEL_OPTIONS_JSON="[{\"id\": \"$model_id\", \"name\": \"$model_name\"}]"
                 else
@@ -157,7 +155,7 @@ case "$1" in
         echo "✅ Successfully updated Claude Code settings:"
         echo "  Primary model (ANTHROPIC_MODEL): $TOP_ALPHA"
         echo "  Fast model (ANTHROPIC_SMALL_FAST_MODEL): $TOP_FREE"
-        echo "  Available models via /model command: $(echo "$ALL_MODELS" | wc -l) models"
+        echo "  Available models via /model command: $(echo "$ALL_MODELS" | grep -c '|') models"
         echo ""
         echo "Settings saved to: $SETTINGS_FILE"
         ;;
