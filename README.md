@@ -60,7 +60,7 @@ export ANTHROPIC_MODEL="nvidia/nemotron-3-super-120b-a12b:free"
 
 ---
 
-## 3. Run openrouter-sync Skill
+## 3. Run openrouter-sync Skill in Claude Code
 
 ### Deployment
 
