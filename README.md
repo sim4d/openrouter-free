@@ -55,6 +55,7 @@ export ANTHROPIC_API_KEY=""                  # <- must be empty!
 export ANTHROPIC_MODEL="nvidia/nemotron-3-super-120b-a12b:free"
 ```
 
+### Install jq
 > **Note:** If `jq` is not installed, run `brew install jq` first.
 
 ---
