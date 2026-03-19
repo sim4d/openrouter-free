@@ -5,27 +5,24 @@ description: Fetches the top free models from OpenRouter and automatically confi
 
 # OpenRouter Model Sync
 
-This skill fetches alpha and free models from https://openrouter.ai/models and automatically configures Claude Code to use them.
+This skill fetches free models from https://openrouter.ai/models and automatically configures Claude Code to use them.
 
 ## What This Skill Does
 
 When invoked, I will:
-1. Call the OpenRouter API to identify alpha and free models
+1. Call the OpenRouter API to identify free models
 2. Filter for models with:
    - High context (>128k tokens)
    - Zero cost ($0 prompt and $0 completion)
-   - Coding capability (inferred from model names/context)
-3. Select top 3 alpha models and top 5 free models from filtered candidates:
-   - **Alpha models**: sorted by OpenRouter's default ordering
-   - **Free models**: sorted by top-weekly token volume — identical ranking to https://openrouter.ai/models?order=top-weekly&q=free
+3. Select top 5 free models sorted by top-weekly token volume — identical ranking to https://openrouter.ai/models?order=top-weekly&q=free
 4. Update `~/.claude/settings.local.json` with:
    - `env` object containing:
      - `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` – set to "1" to disable non-essential traffic
-     - `ANTHROPIC_MODEL` – mapped to the #1 alpha model (primary model for complex tasks)
+     - `ANTHROPIC_MODEL` – mapped to the #1 free model (primary model)
      - `ANTHROPIC_SMALL_FAST_MODEL` – mapped to the #1 free model (fast model for simple operations)
      - `API_TIMEOUT_MS` – extended timeout for model responses
      - `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – increased output token limit
-   - `modelOptions` – additional alpha and free models available via `/model` command
+   - `modelOptions` – top 5 free models available via `/model` command
 
 When invoked with `/openrouter-sync update`, I will:
 - Fetch the latest version of this skill from the GitHub repository
@@ -36,9 +33,8 @@ When invoked with `/openrouter-sync update`, I will:
 This skill uses a bash script (`scripts/openrouter_sync.sh`) that:
 - Fetches model data from the OpenRouter API
 - Filters for zero-cost models ($0 prompt/$0 completion) with >128k context
-- Selects top 3 alpha models (by OpenRouter's default ordering) and top 5 free models sorted by top-weekly token volume via `/api/frontend/models/find?order=top-weekly&q=free` — identical to https://openrouter.ai/models?order=top-weekly&q=free
-- Updates your Claude Code settings with the best models
-- Provides an update mechanism to get the latest skill version
+- Selects top 5 free models sorted by top-weekly token volume via `/api/frontend/models/find?order=top-weekly&q=free` — identical to https://openrouter.ai/models?order=top-weekly&q=free
+- Updates your Claude Code settings with the best free models
 
 ## Prerequisites
 

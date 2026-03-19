@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # OpenRouter Sync Script
-# Fetches alpha and free models from OpenRouter and updates Claude Code settings
+# Fetches free models from OpenRouter and updates Claude Code settings
 
 set -e
 
@@ -23,14 +23,6 @@ if [[ -z "$ANTHROPIC_BASE_URL" || -z "$ANTHROPIC_AUTH_TOKEN" ]]; then
     exit 1
 fi
 
-# Function to fetch alpha models via frontend API (alpha models no longer appear in v1 API)
-fetch_alpha_models() {
-    curl -s "https://openrouter.ai/api/frontend/models/find?order=top-weekly&q=alpha" \
-        -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
-        -H "HTTP-Referer: https://claude.ai" \
-        -H "X-Title: Claude Code"
-}
-
 # Function to fetch free models sorted by top-weekly server-side
 # Uses the same endpoint as https://openrouter.ai/models?order=top-weekly&q=free
 fetch_free_models_ordered() {
@@ -38,21 +30,6 @@ fetch_free_models_ordered() {
         -H "Authorization: Bearer $ANTHROPIC_AUTH_TOKEN" \
         -H "HTTP-Referer: https://claude.ai" \
         -H "X-Title: Claude Code"
-}
-
-# Function to extract alpha models from frontend API response
-# Alpha models use .slug directly (no :free suffix), filtered by openrouter/ prefix and >128k context
-extract_alpha_models() {
-    local models_json="$1"
-    local limit="$2"
-
-    echo "$models_json" | jq -r "
-        .data.models[]
-        | select(.slug | test(\"^openrouter/.*alpha\"))
-        | select(.context_length > 128000)
-        | {id: .slug, context_length: .context_length, name: .name // .slug}
-        | \"\\(.id)|\\(.context_length)|\\(.name)\"
-    " | head -n "$limit"
 }
 
 # Function to extract free models in top-weekly order (ordering applied server-side)
@@ -65,9 +42,8 @@ extract_free_models() {
         .data.models[]
         | select(.endpoint.is_free == true)
         | select(.context_length > 128000)
-        | select(.slug | test(\"alpha\") | not)
         | {id: (.slug + \":free\"), context_length: .context_length, name: .name // .slug}
-        | \"\\(.id)|\\(.context_length)|\\(.name)\"
+        | \"\(.id)|\(.context_length)|\(.name)\"
     " | head -n "$limit"
 }
 
@@ -75,44 +51,25 @@ extract_free_models() {
 case "$1" in
     update)
         # Update the skill itself from GitHub
-        echo "Updating openrouter-skill from GitHub..."
-        SKILL_DIR="/Users/myarc/sandbox/openrouter-free/.claude/skills/openrouter-sync"
-        TEMP_DIR=$(mktemp -d)
-
-        # Clone the latest version (this assumes the skill is in a git repo)
-        # For now, we'll just notify the user to manually update
         echo "To update this skill, please run:"
         echo "  cd /Users/myarc/.claude/plugins/marketplaces/openrouter-free && git pull"
-        echo "Then copy the updated skill:"
-        echo "  cp /Users/myarc/.claude/plugins/marketplaces/openrouter-free/.claude/skills/openrouter-sync/* /Users/myarc/sandbox/openrouter-free/.claude/skills/openrouter-sync/"
-        rm -rf "$TEMP_DIR"
         exit 0
         ;;
     *)
         # Normal operation: fetch and configure models
-        echo "Fetching models from OpenRouter API..."
-        ALPHA_MODELS_JSON=$(fetch_alpha_models)
+        echo "Fetching free models from OpenRouter API..."
         FREE_MODELS_JSON=$(fetch_free_models_ordered)
 
-        if [[ -z "$ALPHA_MODELS_JSON" || -z "$FREE_MODELS_JSON" ]]; then
+        if [[ -z "$FREE_MODELS_JSON" ]]; then
             echo "Error: Failed to fetch models from OpenRouter API"
             exit 1
         fi
 
-        echo "Fetching top 3 alpha models..."
-        ALPHA_MODELS=$(extract_alpha_models "$ALPHA_MODELS_JSON" 3)
-
         echo "Fetching top 5 free models (sorted by top-weekly token volume)..."
         FREE_MODELS=$(extract_free_models "$FREE_MODELS_JSON" 5)
 
-        # Extract the top alpha model for primary use
-        TOP_ALPHA=$(echo "$ALPHA_MODELS" | head -n 1 | cut -d'|' -f1)
-
-        # Extract the top free model for fast use
+        # Extract the top free model for primary use
         TOP_FREE=$(echo "$FREE_MODELS" | head -n 1 | cut -d'|' -f1)
-
-        # Prepare model options list (combine alpha and free, deduplicate while preserving order)
-        ALL_MODELS=$(echo -e "$ALPHA_MODELS\n$FREE_MODELS" | awk -F'|' '!seen[$1]++')
 
         # Build JSON for modelOptions using id and name from the pipe-delimited list
         MODEL_OPTIONS_JSON=""
@@ -124,7 +81,7 @@ case "$1" in
                     MODEL_OPTIONS_JSON=$(echo "$MODEL_OPTIONS_JSON" | jq ". += [{\"id\": \"$model_id\", \"name\": \"$model_name\"}]")
                 fi
             fi
-        done <<< "$ALL_MODELS"
+        done <<< "$FREE_MODELS"
 
         # Update Claude Code settings
         SETTINGS_FILE="$HOME/.claude/settings.local.json"
@@ -136,14 +93,13 @@ case "$1" in
 
         # Update settings with new values - replace entire structure
         TMP_FILE=$(mktemp)
-        jq --arg alpha_model "$TOP_ALPHA" \
-           --arg free_model "$TOP_FREE" \
+        jq --arg free_model "$TOP_FREE" \
            --argjson model_options "$MODEL_OPTIONS_JSON" \
            '
            {
              "env": {
                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-               "ANTHROPIC_MODEL": $alpha_model,
+               "ANTHROPIC_MODEL": $free_model,
                "ANTHROPIC_SMALL_FAST_MODEL": $free_model,
                "API_TIMEOUT_MS": 600000,
                "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
@@ -153,9 +109,8 @@ case "$1" in
            ' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
 
         echo "✅ Successfully updated Claude Code settings:"
-        echo "  Primary model (ANTHROPIC_MODEL): $TOP_ALPHA"
-        echo "  Fast model (ANTHROPIC_SMALL_FAST_MODEL): $TOP_FREE"
-        echo "  Available models via /model command: $(echo "$ALL_MODELS" | grep -c '|') models"
+        echo "  Primary model (ANTHROPIC_MODEL): $TOP_FREE"
+        echo "  Available models via /model command: $(echo "$FREE_MODELS" | grep -c '|') models"
         echo ""
         echo "Settings saved to: $SETTINGS_FILE"
         ;;

@@ -1,13 +1,12 @@
 # openrouter-free
 
-A skill to fetch alpha and free models from https://openrouter.ai/models and automatically configure Claude Code to use them.
+A skill to fetch free models from https://openrouter.ai/models and automatically configure Claude Code to use them.
 
 ## Features
 
-- Automatically fetches top 3 alpha models and top 5 free models from OpenRouter
-- Filters for high-context (>128k), zero-cost ($0 prompt/$0 completion), and coding-capable models
-- Sets primary model to #1 alpha model (for complex tasks)
-- Sets fast model to #1 free model by top-weekly token volume
+- Automatically fetches top 5 free models from OpenRouter
+- Filters for high-context (>128k), zero-cost ($0 prompt/$0 completion) models
+- Sets primary model to #1 free model by top-weekly token volume
 - Updates `~/.claude/settings.local.json` with optimal model mappings
 - No manual model selection required
 
@@ -99,20 +98,12 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 {
   "env": {
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "ANTHROPIC_MODEL": "openrouter/hunter-alpha",
+    "ANTHROPIC_MODEL": "stepfun/step-3.5-flash:free",
     "ANTHROPIC_SMALL_FAST_MODEL": "stepfun/step-3.5-flash:free",
     "API_TIMEOUT_MS": 600000,
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
   },
   "modelOptions": [
-    {
-      "id": "openrouter/hunter-alpha",
-      "name": "Hunter Alpha"
-    },
-    {
-      "id": "openrouter/healer-alpha",
-      "name": "Healer Alpha"
-    },
     {
       "id": "stepfun/step-3.5-flash:free",
       "name": "StepFun: Step 3.5 Flash (free)"
