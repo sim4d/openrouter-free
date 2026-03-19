@@ -73,7 +73,7 @@ In Claude Code:
 /plugin install openrouter-sync@openrouter-free
 ```
 
-### Sync
+### Run
 
 ```
 run /openrouter-sync
