@@ -70,7 +70,7 @@ In Claude Code:
 ```
 
 ```
-/plugin install openrouter-sync
+/plugin install openrouter-sync@openrouter-free
 ```
 
 ### Usage
