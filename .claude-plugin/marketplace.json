@@ -12,7 +12,7 @@
       "author": {
         "name": "sim4d"
       },
-      "source": "./.claude/skills/openrouter-sync",
+      "source": "./plugins/openrouter-sync",
       "category": "productivity"
     }
   ]
