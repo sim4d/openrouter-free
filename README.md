@@ -73,15 +73,25 @@ In Claude Code:
 /plugin install openrouter-sync@openrouter-free
 ```
 
-### Usage
+### Sync
 
 ```
 run /openrouter-sync
 ```
 
+### Change to use new model
+
+```
+! cat ~/.claude/settings.local.json
+```
+
+```
+/model stepfun/step-3.5-flash:free
+```
+
 ---
 
-## Example: Output settings.local.json
+#### Example: Output settings.local.json
 
 After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look like this:
 
@@ -127,9 +137,3 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 }
 ```
 
-**Key settings explained:**
-- `ANTHROPIC_MODEL` – Primary model for complex tasks
-- `ANTHROPIC_SMALL_FAST_MODEL` – Fast model for simple operations
-- `modelOptions` – All models available via `/model` command
-- `API_TIMEOUT_MS` – Extended timeout for free model responses
-- `CLAUDE_CODE_MAX_OUTPUT_TOKENS` – Increased output token limit
