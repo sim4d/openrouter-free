@@ -128,3 +128,24 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
 }
 ```
 
+---
+
+## 4. Config for ChatGPT Codex CLI
+
+Create `~/.codex/config.toml`:
+
+```toml
+model_provider = "openrouter"
+model_reasoning_effort = "high"
+disable_response_storage = true
+
+[model_providers.openrouter]
+name = "openrouter"
+base_url = "https://openrouter.ai/api/v1"
+env_key = "OPENROUTER_API_KEY"
+wire_api = "responses"
+model = "stepfun/step-3.5-flash:free"
+```
+
+Make sure to set the `OPENROUTER_API_KEY` environment variable (same key as above).
+
