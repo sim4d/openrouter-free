@@ -51,7 +51,7 @@ Add these to your shell config (`~/.zshrc`, `~/.bashrc`, or equivalent), then so
 export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
 export ANTHROPIC_AUTH_TOKEN="sk-or-v1-your-openrouter-key-here"
 export ANTHROPIC_API_KEY=""                  # <- must be empty!
-export ANTHROPIC_MODEL="nvidia/nemotron-3-super-120b-a12b:free"
+export ANTHROPIC_MODEL="openrouter/free"
 ```
 
 ### Install jq
@@ -99,7 +99,7 @@ After running `/openrouter-sync`, your `~/.claude/settings.local.json` will look
   "env": {
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "ANTHROPIC_MODEL": "stepfun/step-3.5-flash:free",
-    "ANTHROPIC_SMALL_FAST_MODEL": "stepfun/step-3.5-flash:free",
+    "ANTHROPIC_SMALL_FAST_MODEL": "nvidia/nemotron-3-super-120b-a12b:free",
     "API_TIMEOUT_MS": 600000,
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
   },
