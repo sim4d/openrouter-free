@@ -95,6 +95,7 @@ case "$1" in
         TMP_FILE=$(mktemp)
         jq --arg free_model "$TOP_FREE" \
            --argjson model_options "$MODEL_OPTIONS_JSON" \
+           --arg auth_token "${ANTHROPIC_AUTH_TOKEN:-}" \
            '
            {
              "env": {
@@ -102,8 +103,12 @@ case "$1" in
                "ANTHROPIC_MODEL": $free_model,
                "ANTHROPIC_SMALL_FAST_MODEL": $free_model,
                "API_TIMEOUT_MS": 600000,
-               "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384
-             },
+               "CLAUDE_CODE_MAX_OUTPUT_TOKENS": 16384,
+               "ANTHROPIC_BASE_URL": "https://openrouter.ai/api"
+             } + (if $auth_token != "" then {
+               "ANTHROPIC_AUTH_TOKEN": $auth_token,
+               "ANTHROPIC_API_KEY": ""
+             } else {} end),
              "modelOptions": $model_options
            }
            ' "$SETTINGS_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$SETTINGS_FILE"
